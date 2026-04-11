@@ -1,5 +1,6 @@
 .env
 github_key
 output/
+backup/
 __pycache__/
 .DS_Store
