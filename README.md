@@ -1,6 +1,8 @@
 
 # 🚀 Space Fraction Quest
 
+![Space Fraction Quest Preview](images/SpaceFractionQuest.png)
+
 An interactive, web-based math learning platform designed for 5th-grade students. It combines **educational curriculum** (fractions) with a **Space Zoo** theme, utilizing **Kimi AI (Moonshot)** to dynamically generate fresh word problems and distractors every time.
 
 ## ✨ Features
