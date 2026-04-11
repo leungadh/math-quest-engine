@@ -27,7 +27,7 @@ def gen_stars(count):
     return ", ".join(stars)
 
 def generate_html(data):
-    """Wraps JSON data in a styled HTML template with a Warp Drive star field."""
+    """Wraps JSON data in a styled HTML template with an animated star field."""
     cards_html = ""
     for i, entry in enumerate(data, 1):
         cards_html += f"""
@@ -54,6 +54,7 @@ def generate_html(data):
         </div>
         """
     
+    # Notice we removed 'self.' below and call the function directly
     return f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -71,17 +72,10 @@ def generate_html(data):
             .star {{
                 position: absolute; background: white; border-radius: 50%; opacity: 0.5;
                 animation: move-stars linear infinite;
-                transition: filter 0.5s ease;
             }}
             .star-sm {{ width: 1px; height: 1px; animation-duration: 120s; }}
             .star-md {{ width: 2px; height: 2px; animation-duration: 80s; opacity: 0.7; }}
             .star-lg {{ width: 3px; height: 3px; animation-duration: 40s; opacity: 0.9; }}
-
-            /* 1. Warp Drive Class */
-            .warp {{
-                animation-duration: 2s !important;
-                filter: blur(8px) brightness(2);
-            }}
 
             @keyframes move-stars {{
                 from {{ transform: translateY(0); }}
@@ -98,10 +92,6 @@ def generate_html(data):
             <div class="star star-lg" style="box-shadow: {gen_stars(50)}"></div>
         </div>
 
-        <button onclick="toggleWarp()" class="fixed bottom-8 right-8 z-50 bg-indigo-600 hover:bg-red-600 text-white font-black py-4 px-6 rounded-full shadow-[0_0_20px_rgba(79,70,229,0.6)] transition-all uppercase tracking-widest text-xs">
-            🚀 Engage Warp
-        </button>
-
         <div class="relative max-w-3xl mx-auto z-10">
             <header class="text-center mb-12">
                 <h1 class="text-5xl font-black text-white tracking-tighter mb-2 italic drop-shadow-[0_5px_15px_rgba(99,102,241,0.5)]">SPACE QUEST</h1>
@@ -109,27 +99,9 @@ def generate_html(data):
             </header>
             <div id="quest-container">{cards_html}</div>
             <footer class="mt-12 text-center text-gray-500 text-[10px] tracking-widest uppercase">
-                Systems Nominal // Math Engine v2.5 // Hyperdrive Enabled
+                Systems Nominal // Math Engine v2.4 // Parallax Enabled
             </footer>
         </div>
-
-        <script>
-            function toggleWarp() {{
-                const stars = document.querySelectorAll('.star');
-                const btn = document.querySelector('button');
-                const isWarping = stars[0].classList.contains('warp');
-
-                stars.forEach(star => star.classList.toggle('warp'));
-                
-                if (!isWarping) {{
-                    btn.innerText = "🛑 Disengage";
-                    btn.classList.replace('bg-indigo-600', 'bg-red-600');
-                }} else {{
-                    btn.innerText = "🚀 Engage Warp";
-                    btn.classList.replace('bg-red-600', 'bg-indigo-600');
-                }}
-            }}
-        </script>
     </body>
     </html>
     """
