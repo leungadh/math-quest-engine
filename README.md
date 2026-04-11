@@ -1,8 +1,3 @@
-Since you've moved from a simple script to a full-stack interactive app with a multi-file structure (Flask, Jinja2, and Kimi AI integration), your `README.md` should reflect that complexity while highlighting the fun "Space Zoo" theme.
-
-Here is a comprehensive template you can copy-paste.
-
----
 
 # 🚀 Space Fraction Quest
 
