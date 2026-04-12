@@ -14,6 +14,16 @@ client = OpenAI(
 
 DATA_FILE = "output/quest_data.json"
 
+def _is_valid_mission(item):
+    return (
+        isinstance(item, dict)
+        and item.get('question')
+        and item.get('correct')
+        and isinstance(item.get('distractors'), list)
+        and len(item['distractors']) >= 1
+        and item.get('explanation')
+    )
+
 def fetch_missions_from_ai():
     """Generates 5 interactive fraction problems with distractors and explanations."""
     
@@ -72,7 +82,7 @@ def get_current_missions():
             with open(DATA_FILE, "r") as f:
                 data = json.load(f)
                 # Validation: check if first item has the new 'distractors' key
-                if data and isinstance(data, list) and 'distractors' in data[0]:
+                if data and isinstance(data, list) and all(_is_valid_mission(m) for m in data):
                     return data
         except (json.JSONDecodeError, KeyError, IndexError):
             pass # Fall through to fetch new data

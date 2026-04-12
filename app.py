@@ -1,9 +1,9 @@
 import os
 import json
 import random
-from flask import Flask, render_template_string, redirect, url_for
+from flask import Flask, render_template, redirect, url_for
 from engine import get_current_missions, fetch_missions_from_ai
-from templates import get_ui_template, gen_stars
+from templates import gen_stars
 
 app = Flask(__name__)
 
@@ -23,9 +23,9 @@ def index():
     missions = get_current_missions()
     # 2. GENERATE THREE LAYERS OF STARS
     # Passing three different densities creates the 3D parallax effect
-    return render_template_string(
-        get_ui_template(), 
-        missions=missions, 
+    return render_template(
+        'index.html',
+        missions=missions,
         stars_css=gen_stars(400),    # Small/Distant
         stars_css_md=gen_stars(150), # Medium
         stars_css_lg=gen_stars(50)   # Large/Near
@@ -38,4 +38,4 @@ def generate():
 
 if __name__ == "__main__":
     # Host 0.0.0.0 is better for Docker; Port 5001 avoids macOS AirPlay conflicts
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5001, debug=os.getenv("FLASK_DEBUG", "false").lower() == "true")
