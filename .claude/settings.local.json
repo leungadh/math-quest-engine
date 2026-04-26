@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip show:*)",
+      "Bash(python:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)",
+      "Bash(git -C /Users/andy/claude_lab/math-quest-engine status)",
+      "Bash(git -C /Users/andy/claude_lab/math-quest-engine remote -v)",
+      "Bash(git *)"
+    ]
+  }
+}
