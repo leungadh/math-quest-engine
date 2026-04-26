@@ -52,9 +52,48 @@
         }
 
         details summary::-webkit-details-marker { display:none; }
+
+        /* Congratulations Overlay */
+        #congrats-overlay {
+            display: none;
+            position: fixed; inset: 0; z-index: 100;
+            background: rgba(9, 10, 15, 0.92);
+            backdrop-filter: blur(6px);
+            justify-content: center; align-items: center;
+        }
+        #congrats-overlay.show { display: flex; }
+
+        @keyframes congrats-pop {
+            0%   { transform: scale(0.5); opacity: 0; }
+            70%  { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        .congrats-card {
+            animation: congrats-pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* Firework particles */
+        .firework {
+            position: fixed; width: 6px; height: 6px; border-radius: 50%;
+            pointer-events: none; z-index: 99;
+        }
+        @keyframes burst {
+            0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+        }
     </style>
 </head>
 <body class="min-h-screen py-12 px-4 font-sans">
+
+    <!-- Congratulations Overlay -->
+    <div id="congrats-overlay">
+        <div class="congrats-card text-center px-12 py-10 rounded-3xl border border-indigo-400/40 bg-indigo-950/60 shadow-2xl max-w-sm mx-4">
+            <div class="text-7xl mb-4">🏆</div>
+            <h2 class="text-4xl font-black text-white tracking-tight mb-2">Mission Complete!</h2>
+            <p class="text-indigo-300 text-lg mb-8">You collected all {{ missions|length }} stars, Commander!</p>
+            <a href="/generate" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-full transition-all text-sm tracking-widest uppercase shadow-lg">🚀 New Mission</a>
+        </div>
+    </div>
 
     <div class="stars-container">
         <div class="star star-sm" style="box-shadow: {{ stars_css }}"></div>
@@ -70,7 +109,7 @@
 
     <div class="relative max-w-2xl mx-auto z-10">
         <header class="text-center mb-12">
-            <h1 class="text-5xl font-black text-white tracking-tighter mb-4 italic drop-shadow-[0_5px_15px_rgba(99,102,241,0.5)]">SPACE QUEST</h1>
+            <h1 class="text-5xl font-black text-white tracking-tighter mb-4 italic drop-shadow-[0_5px_15px_rgba(99,102,241,0.5)]">MATH QUEST</h1>
 
             <div class="inline-flex items-center gap-2 bg-indigo-950/50 border border-indigo-500/50 px-5 py-2 rounded-full mb-8 shadow-lg">
                 <span class="text-xs font-bold uppercase tracking-widest text-indigo-300">Stars Collected:</span>
@@ -103,10 +142,12 @@
                 <p class="text-gray-100 text-xl leading-relaxed mb-8">{{ entry.question }}</p>
 
                 <div class="grid grid-cols-1 gap-3 mb-8">
-                    {% set choices = (entry.distractors + [entry.correct]) | shuffle %}
+                    {% set unique_distractors = entry.distractors | reject('equalto', entry.correct) | list %}
+                    {% set choices = (unique_distractors + [entry.correct]) | shuffle %}
                     {% for choice in choices %}
                     <button
-                        onclick="checkAnswer(this, '{{ entry.correct }}', 'star-{{ mission_id }}')"
+                        onclick="checkAnswer(this, 'star-{{ mission_id }}')"
+                        data-correct="{{ 'true' if choice == entry.correct else 'false' }}"
                         class="choice-btn text-left p-4 rounded-xl border border-gray-700 bg-gray-800/40 hover:border-indigo-500 transition-all text-lg">
                         {{ choice }}
                     </button>
@@ -136,8 +177,8 @@
             document.getElementById('warpBtn').innerText = isWarping ? "🛑 Disengage" : "Engage Warp";
         }
 
-        function checkAnswer(btn, correct, starId) {
-            const isCorrect = btn.innerText.trim() === correct.trim();
+        function checkAnswer(btn, starId) {
+            const isCorrect = btn.dataset.correct === 'true';
             const star = document.getElementById(starId);
             const siblings = btn.parentElement.querySelectorAll('.choice-btn');
 
@@ -147,9 +188,40 @@
                 currentScore++;
                 document.getElementById('score').innerText = currentScore;
                 siblings.forEach(s => s.onclick = null);
+                if (currentScore === {{ missions|length }}) {
+                    setTimeout(showCongratulations, 600);
+                }
             } else {
                 btn.classList.add('bg-red-600/30', 'border-red-500');
                 setTimeout(() => { btn.classList.remove('bg-red-600/30', 'border-red-500'); }, 1000);
+            }
+        }
+
+        function showCongratulations() {
+            document.getElementById('congrats-overlay').classList.add('show');
+            const colors = ['#818cf8', '#f472b6', '#facc15', '#34d399', '#60a5fa', '#fb923c'];
+            for (let i = 0; i < 4; i++) {
+                setTimeout(() => launchBurst(colors), i * 350);
+            }
+        }
+
+        function launchBurst(colors) {
+            const cx = 20 + Math.random() * 60;  // % across screen
+            const cy = 20 + Math.random() * 50;
+            for (let i = 0; i < 14; i++) {
+                const p = document.createElement('div');
+                p.className = 'firework';
+                const angle = (i / 14) * 2 * Math.PI;
+                const dist = 80 + Math.random() * 80;
+                p.style.cssText = `
+                    left: ${cx}vw; top: ${cy}vh;
+                    background: ${colors[Math.floor(Math.random() * colors.length)]};
+                    --dx: ${Math.cos(angle) * dist}px;
+                    --dy: ${Math.sin(angle) * dist}px;
+                    animation: burst 0.8s ease-out forwards;
+                `;
+                document.body.appendChild(p);
+                p.addEventListener('animationend', () => p.remove());
             }
         }
     </script>
